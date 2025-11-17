@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Opening WhatsApp…</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{background:#0b1610;color:#d7fbe8;font-family:Arial;text-align:center;padding:40px}
+button{padding:15px 26px;background:#25D366;border:none;border-radius:12px;
+font-size:20px;font-weight:700;color:#fff;cursor:pointer;margin-top:20px}
+</style>
+</head>
+<body>
+
+<h2>Opening WhatsApp…</h2>
+<p>If WhatsApp doesn't open automatically, tap the button below.</p>
+
+<button id="go">Open WhatsApp</button>
+
+<script>
+const q = new URLSearchParams(location.search);
+const phone = q.get("phone");
+const text  = q.get("text") || "";
+
+const link = "https://wa.me/" + phone + "?text=" + encodeURIComponent(text);
+
+// Auto open after 300ms — browser CANNOT rewrite this
+setTimeout(()=>{ window.location.href = link; }, 300);
+
+// Manual fallback
+document.getElementById("go").onclick = ()=> window.location.href = link;
+</script>
+
+</body>
+</html>
