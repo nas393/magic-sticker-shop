@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Magic Sticker Shop — Slytherin Pro UI</title>
+
+<style>
+:root{
+--emerald:#0f5132;--emerald2:#16784c;--silver:#cfcfcf;--electric:#3ec6ff;
+--bg:#06120b;--card:#0b1610;--glass:rgba(255,255,255,0.03);--radius:16px;
+}
+*{box-sizing:border-box}body{
+margin:0;font-family:Inter,Arial;background:linear-gradient(180deg,#04110d,#081912);
+color:var(--silver);padding:18px;-webkit-font-smoothing:antialiased;
+}
+.container{max-width:1100px;margin:0 auto}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.logoBox{display:flex;gap:14px;align-items:center}
+.logo{
+width:60px;height:60px;border-radius:12px;
+background:linear-gradient(135deg,#0a3a28,#0f5132);
+display:flex;justify-content:center;align-items:center;
+box-shadow:0 8px 20px rgba(0,0,0,.6)
+}
+.logo svg{width:40px;height:40px}
+.title{font-size:22px;font-weight:900}
+.badge{padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.06);font-size:13px}
+.layout{display:grid;grid-template-columns:380px 1fr;gap:22px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+.card{
+background:var(--card);border-radius:var(--radius);
+padding:20px;border:1px solid rgba(255,255,255,.04);
+box-shadow:0 12px 30px rgba(0,0,0,.6)
+}
+.sectionTitle{font-size:16px;font-weight:800;color:#9af5c8;margin-bottom:8px}
+.uploadArea{
+border:2px dashed rgba(255,255,255,.08);padding:20px;border-radius:14px;
+text-align:center;background:var(--glass);cursor:pointer
+}
+.preview{max-width:100%;border-radius:12px;margin-top:12px;display:none}
+.optGrid div{
+margin-top:12px;background:rgba(255,255,255,.03);padding:14px;
+border-radius:12px;display:flex;justify-content:space-between
+}
+.qty{width:90px;padding:10px;border-radius:10px;border:2px solid rgba(255,255,255,.08);
+text-align:center;font-weight:900;background:#fff;color:#000}
+.summaryBox{padding:12px;border-radius:12px;background:rgba(255,255,255,.035)}
+.totalRow{
+margin-top:18px;background:rgba(62,198,255,.06);padding:14px;
+display:flex;justify-content:space-between;border-radius:12px;font-size:20px;
+font-weight:900;color:var(--electric)
+}
+.waButton{
+margin-top:16px;width:100%;padding:16px;border:none;border-radius:999px;
+background:linear-gradient(90deg,#25D366,#1bbf57);
+color:#fff;font-weight:900;font-size:20px;cursor:pointer
+}
+.footer{text-align:center;margin-top:16px;font-size:14px;color:rgba(255,255,255,.6)}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header class="header">
+<div class="logoBox">
+  <div class="logo">
+    <svg viewBox="0 0 120 120">
+      <rect width="120" height="120" rx="20" fill="#083226"/>
+      <path d="M30 85 L60 25 L90 85 Z" fill="#bfffe6"/>
+    </svg>
+  </div>
+  <div>
+    <div class="title">Magic Sticker Shop</div>
+    <div style="font-size:13px;color:#eee">Create, print, stick — Slytherin Premium Edition</div>
+  </div>
+</div>
+<div class="badge">+961 81 030 754</div>
+</header>
+
+<div class="layout">
+
+<!-- LEFT -->
+<div class="card">
+
+<div class="sectionTitle">1) Upload your image</div>
+
+<div class="uploadArea" id="uploadArea">
+  Tap to upload<br>
+  <input id="fileInput" type="file" accept="image/*" style="display:none">
+</div>
+
+<canvas id="canvas" class="preview"></canvas>
+<img id="previewImg" class="preview" alt="Preview">
+
+<div class="sectionTitle" style="margin-top:22px">2) Choose sizes</div>
+
+<div class="optGrid">
+  <div>
+    <span>Small Pack — 1000 KZ</span>
+    <input type="number" id="qSmall" class="qty" min="0" value="0">
+  </div>
+  <div>
+    <span>Half A4 — 3000 KZ</span>
+    <input type="number" id="qHalf" class="qty" min="0" value="0">
+  </div>
+  <div>
+    <span>Full A4 — 5000 KZ</span>
+    <input type="number" id="qFull" class="qty" min="0" value="0">
+  </div>
+</div>
+
+</div>
+
+<!-- RIGHT -->
+<div class="card">
+
+<div class="sectionTitle">Order Summary</div>
+
+<div id="summary" class="summaryBox">No items selected</div>
+
+<div class="totalRow">
+  <span>Total</span>
+  <span id="total">0 KZ</span>
+</div>
+
+<button class="waButton" id="waBtn">Order via WhatsApp</button>
+
+<div class="footer">
+Fast printing · High quality · Kid-friendly UX
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+const PHONE = "96181030754";
+const DOMAIN = "YOURDOMAIN.COM"; // ← CHANGE THIS
+
+const fileInput = document.getElementById("fileInput");
+const uploadArea = document.getElementById("uploadArea");
+const canvas = document.getElementById("canvas");
+const previewImg = document.getElementById("previewImg");
+
+const qSmall=document.getElementById("qSmall");
+const qHalf=document.getElementById("qHalf");
+const qFull=document.getElementById("qFull");
+
+const summary=document.getElementById("summary");
+const total=document.getElementById("total");
+
+let dataURL=null;
+
+/*** Upload handling ***/
+uploadArea.onclick=()=>fileInput.click();
+fileInput.onchange=()=>{ if(fileInput.files[0]) process(fileInput.files[0]); };
+
+function process(file){
+  const r=new FileReader();
+  r.onload=e=>{
+    const img=new Image();
+    img.onload=()=>crop(img);
+    img.src=e.target.result;
+  };
+  r.readAsDataURL(file);
+}
+
+function crop(img){
+  const size=Math.min(img.width,img.height);
+  const sx=(img.width-size)/2;
+  const sy=(img.height-size)/2;
+
+  canvas.width=1000;
+  canvas.height=1000;
+  const ctx=canvas.getContext("2d");
+
+  ctx.drawImage(img,sx,sy,size,size,0,0,1000,1000);
+
+  dataURL=canvas.toDataURL("image/png");
+  previewImg.src=dataURL;
+  previewImg.style.display="block";
+  canvas.style.display="none";
+
+  update();
+}
+
+/*** Summary logic ***/
+[qSmall,qHalf,qFull].forEach(el=>el.oninput=update);
+
+function update(){
+  const s=+qSmall.value||0;
+  const h=+qHalf.value||0;
+  const f=+qFull.value||0;
+
+  let txt="";
+  let totalKZ=0;
+
+  if(s){ txt+=`Small × ${s} = ${s*1000} KZ<br>`; totalKZ+=s*1000; }
+  if(h){ txt+=`Half A4 × ${h} = ${h*3000} KZ<br>`; totalKZ+=h*3000; }
+  if(f){ txt+=`Full A4 × ${f} = ${f*5000} KZ<br>`; totalKZ+=f*5000; }
+
+  summary.innerHTML=txt || "No items selected";
+  total.textContent=totalKZ+" KZ";
+}
+
+/*** WhatsApp redirect-safe version ***/
+document.getElementById("waBtn").onclick=()=>{
+  const msg=
+`MAGIC STICKER ORDER
+
+Small: ${qSmall.value}
+Half A4: ${qHalf.value}
+Full A4: ${qFull.value}
+
+Total: ${total.textContent}
+Image: ${dataURL?"YES":"NO"}`;
+
+  const redirect =
+    `https://${DOMAIN}/redirect.html?phone=${PHONE}&text=` +
+    encodeURIComponent(msg);
+
+  window.location.href = redirect;
+};
+</script>
+
+</body>
+</html>
